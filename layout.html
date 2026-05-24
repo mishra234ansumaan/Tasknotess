@@ -16,34 +16,31 @@
   <!-- HEADER -->
 
   <header>
-
-    <h2>📝 NoteNest</h2>
+  <div class="brand-container">
+    <svg class="blackhole-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="18" fill="black" stroke="#fbfff1" stroke-width="1.5"/>
+      <path d="M10,62 C30,55 70,45 90,38 C70,45 30,55 10,62 Z" fill="#fbfff1"/>
+      <path d="M15,60 Q50,40 85,40" fill="none" stroke="#fbfff1" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20,61 Q50,62 80,41" fill="none" stroke="#fbfff1" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <h2>📝NoteNest</h2>
+  </div>
 
     <!-- NAVIGATION BUTTONS -->
 
     <nav>
+    <button class="nav-btn " onclick="showSection('dashboard-section', this)">Dashboard</button>
+    <button class="nav-btn" onclick="showSection('manager-section', this)">Notes Manager</button>
+    <button class="nav-btn" onclick="showSection('account-section', this)">Account</button>
+  </nav>
 
-      <button>Dashboard</button>
-
-      <button>Notes Manager</button>
-
-      <button>Account</button>
-
-    </nav>
-
-    <div>
-
-      <span class="badge">Dark Mode</span>
-
-      <span class="badge">Pinned Notes</span>
-
-      <span class="badge">Custom Theme</span>
-
-      <button>Logout</button>
-
-    </div>
-
-  </header>
+  <div class="header-actions">
+    <span class="badge">Dark Mode</span>
+    <span class="badge">Pinned Notes</span>
+    <span class="badge">Custom Theme</span>
+    <button class="btn-logout">Logout</button>
+  </div>
+</header>
 
 
   <div class="container">
@@ -434,3 +431,4 @@
 </body>
 
 </html>
+
