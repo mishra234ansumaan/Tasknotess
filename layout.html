@@ -12,38 +12,34 @@
 </head>
 
 <body>
-
+  <div id="toast-message"></div>
+<div class="stars"></div>
   <!-- HEADER -->
 
   <header>
-
-    <h2>📝 NoteNest</h2>
+  <div class="brand-container">
+    <svg class="blackhole-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="18" fill="black" stroke="#fbfff1" stroke-width="1.5"/>
+      <path d="M10,62 C30,55 70,45 90,38 C70,45 30,55 10,62 Z" fill="#fbfff1"/>
+      <path d="M15,60 Q50,40 85,40" fill="none" stroke="#fbfff1" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20,61 Q50,62 80,41" fill="none" stroke="#fbfff1" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <h2>📝NoteNest</h2>
+  </div>
 
     <!-- NAVIGATION BUTTONS -->
 
     <nav>
+    <button class="nav-btn " onclick="showSection('dashboard-section', this)">Dashboard</button>
+    <button class="nav-btn" onclick="showSection('manager-section', this)">Notes Manager</button>
+    <button class="nav-btn" onclick="showSection('account-section', this)">Account</button>
+  </nav>
 
-      <button>Dashboard</button>
-
-      <button>Notes Manager</button>
-
-      <button>Account</button>
-
-    </nav>
-
-    <div>
-
-      <span class="badge">Dark Mode</span>
-
-      <span class="badge">Pinned Notes</span>
-
-      <span class="badge">Custom Theme</span>
-
-      <button>Logout</button>
-
-    </div>
-
-  </header>
+  <div class="header-actions">
+    <span class="badge"id="dark-mode-btn"onclick="toggleDarkMode()">Dark Mode</span>
+   <button class="btn-logout" onclick="logoutUser()">Logout</button>
+  </div>
+</header>
 
 
   <div class="container">
@@ -59,16 +55,15 @@
 
         <h2>Login / Signup</h2>
 
-        <input type="text" placeholder="Enter Your Name">
+        <input type="text" id="signup-name" placeholder="Enter Your Name">
 
-        <input type="email" placeholder="Enter Your Email">
+        <input type="email" id="signup-email" placeholder="Enter Your Email">
 
-        <input type="password" placeholder="Enter Password">
+        <input type="password" id="signup-password" placeholder="Enter Password">
 
-        <button>Signup</button>
+        <button onclick="signupUser()">Signup</button>
 
-        <button>Login</button>
-
+        <button onclick="loginUser()">Login</button>
       </div>
 
 
@@ -78,11 +73,11 @@
 
         <h2>👤 User Profile</h2>
 
-        <p><strong>Name:</strong> Padhaku Singh</p>
+        <p><strong>Name:</strong> <span id="profile-name">Guest User</span></p>
 
-        <p><strong>Email:</strong> padhaku@gmail.com</p>
+        <p><strong>Email:</strong> <span id="profile-email">Not Logged In</span></p>
 
-        <p><strong>Member Since:</strong> May 2026</p>
+        <p><strong>Member Since:</strong> <span id="member-since"></span></p>
 
       </div>
 
@@ -95,7 +90,7 @@
 
         <label for="theme-color-select">Select Theme Color</label>
 
-        <select id="theme-color-select" title="Select Theme Color">
+        <select id="theme-color-select"onchange="changeThemeColor()">
 
           <option>Yellow</option>
 
@@ -110,7 +105,7 @@
 
         <label for="font-style-select">Select Font Style</label>
 
-        <select id="font-style-select" title="Select Font Style">
+        <select id="font-style-select"onchange="changeFontStyle()">
 
           <option>Arial</option>
 
@@ -123,7 +118,7 @@
 
         <label for="notes-view-select">Choose Notes View</label>
 
-        <select id="notes-view-select" title="Choose Notes View">
+        <select id="notes-view-select"onchange="changeNotesView()">
 
           <option>Grid View</option>
 
@@ -148,11 +143,11 @@
 
         <h2>📊 Notes Statistics</h2>
 
-        <p>Total Notes: 12</p>
+        <p>Total Notes:<span id="total-notes">4</span></p>
 
         <div class="box">
 
-          <p>Pinned Notes: 4</p>
+          <p>Pinned Notes:<span id="pinned-notes">1</span></p>
 
           <div class="progress-bar">
 
@@ -161,7 +156,7 @@
           </div>
 
 
-          <p>Archived Notes: 2</p>
+          <p>Archived Notes:<span id="archived-count">0</span></p>
 
           <div class="progress-bar">
 
@@ -169,8 +164,7 @@
 
           </div>
 
-
-          <p>Completed Tasks: 6</p>
+          <p>Completed Tasks:<span id="completed-notes">0</span></p>
 
           <div class="progress-bar">
 
@@ -190,9 +184,9 @@
 
         <h2>Create New Note</h2>
 
-        <input type="text" placeholder="Enter Note Title">
+        <input type="text" id="note-title" placeholder="Enter Note Title">
 
-        <textarea rows="5" placeholder="Write your note here..."></textarea>
+        <textarea rows="5" id="note-text" placeholder="Write your note here..."></textarea>
 
 
         <label>Select Category</label>
@@ -210,9 +204,24 @@
         </select>
 
 
-        <label>Select Note Color</label>
+        <label for="note-color">Select Note Color</label>
+        <label for="note-tag">Select Note Type</label>
 
-        <select aria-label="Select Note Color">
+      <select id="note-tag"  name="note-type" >
+
+       <option>📌 Priority Task</option>
+
+       <option>⭐ Favorite Project</option>
+
+       <option>⏰ Reminder Enabled</option>
+
+       <option>🚀 Upcoming Event</option>
+
+       <option>💡 Creative Idea</option>
+
+       </select>
+
+        <select id="note-color" name="Select Note Color">
 
           <option>Yellow</option>
 
@@ -224,18 +233,7 @@
 
         </select>
 
-
-        <label>
-
-          Pin this note
-
-          <input type="checkbox">
-
-        </label>
-
-        <br>
-
-        <button>Save Note</button>
+       <button onclick="addNote()">Save Note</button>
 
       </div>
 
@@ -247,29 +245,13 @@
 
         <h2>⏰ Set Reminder</h2>
 
-        <input type="text" placeholder="Enter Note Title">
+       <input type="text" id="reminder-note-title" placeholder="Enter Note Title">
 
+       <input type="date" id="reminder-date" title="Select reminder date">
 
-        <label>
+       <input type="time" id="reminder-time" title="Select reminder time">
 
-          Reminder Date:
-
-          <input type="date">
-
-        </label>
-
-
-        <label>
-
-          Reminder Time:
-
-          <input type="time">
-
-        </label>
-
-
-        <button>Save Reminder</button>
-
+       <button onclick="setReminder()">Save Reminder</button>
       </div>
 
     </div>
@@ -287,8 +269,7 @@
 
         <h2>🔍 Search Notes</h2>
 
-        <input type="text" placeholder="Search your notes here...">
-
+        <input type="text" id="search-input"placeholder="Search your notes here..."onkeyup="searchNotes()">
       </div>
 
 
@@ -297,7 +278,7 @@
 
       <h2>Your Notes</h2>
 
-      <div class="notes-grid">
+      <div class="notes-grid"id="main-notes-container">
 
 
         <!-- NOTE 1 -->
@@ -310,15 +291,17 @@
             Complete 5 array problems and revise binary search concepts before 8 PM.
           </p>
 
-          <small>📌 Priority Task</small>
+          <small class="note-tag">📌 Priority Task</small>
 
           <div class="actions">
 
-            <button class="edit-btn">Edit</button>
+            <button class="edit-btn" onclick="editNote(this)">Edit</button>
 
-            <button class="delete-btn">Delete</button>
+            <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
 
-            <button class="archive-btn">Archive</button>
+            <button class="archive-btn"onclick="archiveNote(this)">Archive</button>
+
+            <button class="complete-btn"onclick="completeTask(this)">Complete</button>
 
           </div>
 
@@ -336,15 +319,17 @@
             Design responsive navbar and connect login page with backend API.
           </p>
 
-          <small>⭐ Favorite Project</small>
+          <small class="note-tag">⭐ Favorite Project</small>
 
           <div class="actions">
 
-            <button class="edit-btn">Edit</button>
+           <button class="edit-btn" onclick="editNote(this)">Edit</button>
 
-            <button class="delete-btn">Delete</button>
+           <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
 
-            <button class="archive-btn">Archive</button>
+            <button class="archive-btn"onclick="archiveNote(this)">Archive</button>
+
+            <button class="complete-btn"onclick="completeTask(this)">Complete</button>
 
           </div>
 
@@ -362,15 +347,17 @@
             Learn basics of Docker containers and complete Linux command practice.
           </p>
 
-          <small>⏰ Reminder Enabled</small>
+          <small class="note-tag">⏰ Reminder Enabled</small>
 
           <div class="actions">
 
-            <button class="edit-btn">Edit</button>
+            <button class="edit-btn" onclick="editNote(this)">Edit</button>
 
-            <button class="delete-btn">Delete</button>
+            <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
 
-            <button class="archive-btn">Archive</button>
+            <button class="archive-btn"onclick="archiveNote(this)">Archive</button>
+
+            <button class="complete-btn"onclick="completeTask(this)">Complete</button>
 
           </div>
 
@@ -388,15 +375,16 @@
             Finalize AI idea presentation and prepare project workflow diagram.
           </p>
 
-          <small>🚀 Upcoming Event</small>
-
+          <small class="note-tag">🚀 Upcoming Event</small>
           <div class="actions">
 
-            <button class="edit-btn">Edit</button>
+            <button class="edit-btn" onclick="editNote(this)">Edit</button>
 
-            <button class="delete-btn">Delete</button>
+            <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
 
-            <button class="archive-btn">Archive</button>
+            <button class="archive-btn"onclick="archiveNote(this)">Archive</button>
+
+            <button class="complete-btn"onclick="completeTask(this)">Complete</button>
 
           </div>
 
@@ -406,22 +394,17 @@
 
 
 
-      <!-- EMPTY NOTES MESSAGE -->
+      <!-- ARCHIEVED NOTES MESSAGE -->
 
       <div class="box">
 
-        <h2>🧐 Empty Notes Section</h2>
+     <h2>🤖Archived Notes</h2>
 
-        <p>
-          You currently have no deleted notes available.
-        </p>
+   <button onclick="toggleArchive()"> Show Archived Notes</button>
 
-      </div>
-
-    </div>
+   <div id="archive-container" style="display:none; margin-top:20px;"></div>
 
   </div>
-
 
   <!-- FOOTER -->
 
@@ -430,6 +413,7 @@
     © 2026 NoteNest | Personalized Notes Web App
 
   </footer>
+  <script src="script.js"></script>
 
 </body>
 
