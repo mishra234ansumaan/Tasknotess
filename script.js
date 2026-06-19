@@ -476,6 +476,73 @@ async function signupUser(){
     document.getElementById("profile-name").innerText = data.data?.username || name;
     document.getElementById("profile-email").innerText = data.data?.email || email;
     document.getElementById("member-since").innerText = "Member since now";
+    let isLoggingIn = false;
+
+async function loginUser() {
+  if (isLoggingIn) return;
+
+  // 1. Fixed: Target login elements instead of signup elements, and trim inputs
+  const emailInput = document.getElementById("login-email"); // Check your HTML for this ID
+  const passwordInput = document.getElementById("login-password"); // Check your HTML for this ID
+  const loginBtn = document.getElementById("login-submit-btn"); // Optional button selector
+
+  const email = emailInput?.value.trim();
+  const password = passwordInput?.value;
+
+  if (!email || !password) {
+    showToast("⚠️ Enter email and password");
+    return;
+  }
+
+  try {
+    isLoggingIn = true;
+    if (loginBtn) loginBtn.disabled = true;
+
+    const response = await fetchWithTimeout("http://localhost:5000/api/v1/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showToast("Login failed: " + (data.error || data.message || "Try again"));
+      return;
+    }
+
+    // 2. Dynamic profile updates using response data
+    document.getElementById("profile-name").innerText = data.data?.username || "User";
+    document.getElementById("profile-email").innerText = data.data?.email || email;
+    
+    // 3. Dynamic formatting for membership date if available
+    const memberDate = data.data?.createdAt ? new Date(data.data.createdAt).getFullYear() : new Date().getFullYear();
+    document.getElementById("member-since").innerText = `Member since ${memberDate}`;
+    
+    loggedIn = true;
+    showToast("✅ Logged in successfully");
+
+    // 4. Fixed: Safely clear input fields using optional chaining to prevent crashes
+    if (emailInput) emailInput.value = "";
+    if (passwordInput) passwordInput.value = "";
+    
+  } catch (error) {
+    console.error("Login failed:", error);
+    if (error.name === 'AbortError') {
+      showToast("⚠️ Backend not responding. Check if server is running.");
+    } else {
+      showToast("Login request failed: " + error.message);
+    }
+  } finally {
+    isLoggingIn = false;
+    if (loginBtn) loginBtn.disabled = false;
+  }
+}
+
+
     loggedIn = true;
     showToast("🎉 Welcome to NoteNest " + name);
 
