@@ -1,1 +1,63 @@
-// models/User.js\nconst mongoose = require('mongoose');\nconst bcrypt = require('bcryptjs');\nconst jwt = require('jsonwebtoken');\n\nconst UserSchema = new mongoose.Schema({\n  username: {\n    type: String,\n    required: [true, 'Please add a username'],\n    unique: true,\n    trim: true,\n    maxlength: [20, 'Username can not be more than 20 characters'],\n  },\n  email: {\n    type: String,\n    required: [true, 'Please add an email'],\n    unique: true,\n    match: [\n      /^(([^<>()[\]\\\\.,;:\\s@\\\"]+(\\.[^<>()[\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$/,\n      'Please add a valid email',\n    ],\n  },\n  password: {\n    type: String,\n    required: [true, 'Please add a password'],\n    minlength: 6,\n    select: false, // Don't return password in queries\n  },\n  refreshToken: String,\n  googleId: {\n    type: String,\n    unique: true,\n    sparse: true, // Allows null values to not violate unique constraint\n  },\n  createdAt: {\n    type: Date,\n    default: Date.now,\n  },\n});\n\n// Encrypt password using bcrypt\nUserSchema.pre('save', async function (next) {\n  if (!this.isModified('password')) {\n    next();\n  }\n  const salt = await bcrypt.genSalt(10);\n  this.password = await bcrypt.hash(this.password, salt);\n});\n\n// Sign JWT and return\nUserSchema.methods.getSignedJwtToken = function () {\n  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {\n    expiresIn: process.env.JWT_EXPIRE,\n  });\n};\n\n// Match user entered password to hashed password in database\nUserSchema.methods.matchPassword = async function (enteredPassword) {\n  return await bcrypt.compare(enteredPassword, this.password);\n};\n\nmodule.exports = mongoose.model('User', UserSchema);\n```
+// models/User.js
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const UserSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: [true, 'Please add a username'],
+    unique: true,
+    trim: true,
+    maxlength: [20, 'Username can not be more than 20 characters'],
+  },
+  email: {
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    match: [
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      'Please add a valid email',
+    ],
+  },
+  password: {
+    type: String,
+    required: [true, 'Please add a password'],
+    minlength: 6,
+    select: false, // Don't return password in queries
+  },
+  refreshToken: String,
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Encrypt password using bcrypt
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Sign JWT and return
+UserSchema.methods.getSignedJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+};
+
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', UserSchema);

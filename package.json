@@ -11,7 +11,7 @@
     "helmet": "^8.2.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.7.0",
+    "mongoose": "^9.7.1",
     "morgan": "^1.11.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
@@ -22,5 +22,24 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  }
+  },
+  "name": "tasknotess",
+  "version": "1.0.0",
+  "description": "A full stack notes web app with authentication and CRUD functionality",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mishra234ansumaan/Tasknotess.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mishra234ansumaan/Tasknotess/issues"
+  },
+  "homepage": "https://github.com/mishra234ansumaan/Tasknotess#readme"
 }

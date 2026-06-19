@@ -3,11 +3,13 @@ const Note = require('../models/Note');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Get all notes
+// @desc    Get all notes (user-scoped)
 // @route   GET /api/v1/notes
-// @access  Private
 exports.getNotes = asyncHandler(async (req, res, next) => {
-  const notes = await Note.find({ user: req.user.id });
+  const userId = req.user ? req.user.id : null;
+  const query = userId ? { user: userId } : {};
+
+  const notes = await Note.find(query);
 
   res.status(200).json({
     success: true,
@@ -18,12 +20,16 @@ exports.getNotes = asyncHandler(async (req, res, next) => {
 
 // @desc    Get single note
 // @route   GET /api/v1/notes/:id
-// @access  Private
 exports.getNote = asyncHandler(async (req, res, next) => {
-  const note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  const note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
+  }
+
+  // Ensure owner access if note has a user
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to access this note', 401));
   }
 
   res.status(200).json({
@@ -34,11 +40,11 @@ exports.getNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Create new note
 // @route   POST /api/v1/notes
-// @access  Private
 exports.createNote = asyncHandler(async (req, res, next) => {
-  req.body.user = req.user.id;
+  const payload = { ...req.body };
+  if (req.user) payload.user = req.user.id;
 
-  const note = await Note.create(req.body);
+  const note = await Note.create(payload);
 
   res.status(201).json({
     success: true,
@@ -48,15 +54,18 @@ exports.createNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Update note
 // @route   PUT /api/v1/notes/:id
-// @access  Private
 exports.updateNote = asyncHandler(async (req, res, next) => {
-  let note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  let note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
   }
 
-  note = await Note.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, req.body, {
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to update this note', 401));
+  }
+
+  note = await Note.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
@@ -69,12 +78,15 @@ exports.updateNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Delete note
 // @route   DELETE /api/v1/notes/:id
-// @access  Private
 exports.deleteNote = asyncHandler(async (req, res, next) => {
-  const note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  const note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
+  }
+
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to delete this note', 401));
   }
 
   await note.deleteOne();
@@ -87,15 +99,18 @@ exports.deleteNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Archive note
 // @route   PUT /api/v1/notes/:id/archive
-// @access  Private
 exports.archiveNote = asyncHandler(async (req, res, next) => {
-  let note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  let note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
   }
 
-  note = await Note.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, { archived: true }, {
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to archive this note', 401));
+  }
+
+  note = await Note.findByIdAndUpdate(req.params.id, { archived: true }, {
     new: true,
     runValidators: true,
   });
@@ -108,15 +123,18 @@ exports.archiveNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Unarchive note
 // @route   PUT /api/v1/notes/:id/unarchive
-// @access  Private
 exports.unarchiveNote = asyncHandler(async (req, res, next) => {
-  let note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  let note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
   }
 
-  note = await Note.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, { archived: false }, {
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to unarchive this note', 401));
+  }
+
+  note = await Note.findByIdAndUpdate(req.params.id, { archived: false }, {
     new: true,
     runValidators: true,
   });
@@ -129,15 +147,18 @@ exports.unarchiveNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Complete note (task)
 // @route   PUT /api/v1/notes/:id/complete
-// @access  Private
 exports.completeNote = asyncHandler(async (req, res, next) => {
-  let note = await Note.findOne({ _id: req.params.id, user: req.user.id });
+  let note = await Note.findById(req.params.id);
 
   if (!note) {
     return next(new ErrorResponse(`Note not found with id of ${req.params.id}`, 404));
   }
 
-  note = await Note.findOneAndUpdate({ _id: req.params.id, user: req.user.id }, { completed: true }, {
+  if (note.user && req.user && note.user.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to complete this note', 401));
+  }
+
+  note = await Note.findByIdAndUpdate(req.params.id, { completed: true }, {
     new: true,
     runValidators: true,
   });
@@ -150,19 +171,24 @@ exports.completeNote = asyncHandler(async (req, res, next) => {
 
 // @desc    Search notes
 // @route   GET /api/v1/notes/search
-// @access  Private
 exports.searchNotes = asyncHandler(async (req, res, next) => {
-  const { q } = req.query;
+  const q = req.query.q || '';
+  const regex = { $regex: q, $options: 'i' };
 
-  const notes = await Note.find({
-    user: req.user.id,
+  let filter = {
     $or: [
-      { title: { $regex: q, $options: 'i' } },
-      { content: { $regex: q, $options: 'i' } },
-      { category: { $regex: q, $options: 'i' } },
-      { tag: { $regex: q, $options: 'i' } },
+      { title: regex },
+      { content: regex },
+      { category: regex },
+      { tag: regex },
     ],
-  });
+  };
+
+  if (req.user) {
+    filter = { $and: [{ user: req.user.id }, filter] };
+  }
+
+  const notes = await Note.find(filter);
 
   res.status(200).json({
     success: true,

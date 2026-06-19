@@ -1,13 +1,16 @@
-// config/db.js
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    const uri =
+      process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/notedb';
+
+    const conn = await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
     logger.error(`Error: ${err.message}`);

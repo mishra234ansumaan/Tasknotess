@@ -17,7 +17,7 @@ const NoteSchema = new mongoose.Schema({
     default: 'Other',
   },
   tag: {
-    type: [String],
+    type: String,
     maxlength: [50, 'Tag can not be more than 50 characters'],
   },
   color: {
@@ -39,7 +39,7 @@ const NoteSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: true,
+    required: false,
   },
   createdAt: {
     type: Date,

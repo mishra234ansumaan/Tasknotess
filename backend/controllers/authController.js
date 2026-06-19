@@ -80,19 +80,30 @@ const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
 
+  const maxAge = process.env.JWT_COOKIE_EXPIRE
+    ? parseInt(process.env.JWT_COOKIE_EXPIRE, 10) * 24 * 60 * 60 * 1000
+    : 7 * 24 * 60 * 60 * 1000; // default 7 days
+
   const options = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
+    maxAge,
     httpOnly: true,
+    sameSite: 'lax',
   };
 
   if (process.env.NODE_ENV === 'production') {
     options.secure = true;
   }
 
-  res.status(statusCode).cookie('token', token, options).json({
-    success: true,
-    token,
-  });
+  // Set cookie and return basic user info only (cookie-only auth)
+  res
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({
+      success: true,
+      data: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
 };
