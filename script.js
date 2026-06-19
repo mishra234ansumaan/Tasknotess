@@ -352,36 +352,36 @@ function signupUser(){
   let password = document.getElementById("signup-password").value;
 
   if(name === "" || email === "" || password === ""){
-
     showToast("⚠️ Fill all signup fields");
-
     return;
+  }
 
+  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if(!emailRegex.test(email)){
+    showToast("⚠️ Please enter a valid email address");
+    return;
   }
 
   document.getElementById("profile-name").innerText = name;
-
   document.getElementById("profile-email").innerText = email;
 
   let today = new Date();
 
   let memberSince = today.toLocaleString("en-US", {
-  month: "long",
-  year: "numeric"
+    month: "long",
+    year: "numeric"
   });
 
-document.getElementById("member-since").innerText = memberSince;
+  document.getElementById("member-since").innerText = memberSince;
 
   loggedIn = true;
 
   showToast("🎉 Welcome to NoteNest " + name);
 
   document.getElementById("signup-name").value = "";
-
   document.getElementById("signup-email").value = "";
-
   document.getElementById("signup-password").value = "";
-
 }
 
 function loginUser(){
@@ -399,6 +399,13 @@ function loginUser(){
     return;
 
   }
+  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if(!emailRegex.test(email)){
+    showToast("⚠️ Please enter a valid email address");
+    return;
+  }
+
 
   document.getElementById("profile-name").innerText = name;
 
