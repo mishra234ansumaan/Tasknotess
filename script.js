@@ -23,8 +23,7 @@ function showSection(sectionId, button){
 
 }
 let loggedIn = false;
-let completedTasks = 0;
-let archivedNotes = 0;
+
 function addNote(){
 
   let title =document.getElementById("note-title").value;
@@ -69,8 +68,6 @@ showToast("🔥 Boom! Your note just entered the NoteNest universe , Note captur
 
   document.getElementById("note-text").value = "";
 
-
-  updateStatistics();
 }
 
 function showToast(message){
@@ -108,7 +105,6 @@ function deleteNote(button){
   noteCard.remove();
 
   showToast("🗑️ Poof! Your note vanished into the NoteNest blackhole ");
- updateStatistics();
 }
 
 function searchNotes(){
@@ -212,30 +208,6 @@ function saveEditedNote(button){
 
 }
 
-function updateStatistics(){
-
-  let allNotes = document.querySelectorAll(".note-card");
-
-  let totalNotes = allNotes.length;
-
-  let pinnedNotes = 0;
-
-  allNotes.forEach(function(note){
-    let tag = note.querySelector(".note-tag").innerText;
-
-    if(tag.includes("📌")){
-
-      pinnedNotes++;
-
-    }
-
-  });
-
-  document.getElementById( "total-notes" ).innerText = totalNotes;
-
-  document.getElementById( "pinned-notes" ).innerText = pinnedNotes;
-
-}
 
 function completeTask(button){
 
@@ -243,17 +215,12 @@ function completeTask(button){
 
   noteCard.remove();
 
-  completedTasks++;
-
   document.getElementById("completed-notes" ).innerText = completedTasks;
 
-  updateStatistics();
 
   showToast( "✅ Mission completed! Productivity level increased");
 
 }
-updateStatistics();
-
 
 function toggleArchive(){
 
