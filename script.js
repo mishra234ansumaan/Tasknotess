@@ -514,18 +514,18 @@ async function loginUser() {
       return;
     }
 
-    // 2. Dynamic profile updates using response data
+    
     document.getElementById("profile-name").innerText = data.data?.username || "User";
     document.getElementById("profile-email").innerText = data.data?.email || email;
     
-    // 3. Dynamic formatting for membership date if available
+    
     const memberDate = data.data?.createdAt ? new Date(data.data.createdAt).getFullYear() : new Date().getFullYear();
     document.getElementById("member-since").innerText = `Member since ${memberDate}`;
     
     loggedIn = true;
     showToast("✅ Logged in successfully");
 
-    // 4. Fixed: Safely clear input fields using optional chaining to prevent crashes
+    
     if (emailInput) emailInput.value = "";
     if (passwordInput) passwordInput.value = "";
     

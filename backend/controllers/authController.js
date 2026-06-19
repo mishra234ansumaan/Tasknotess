@@ -23,29 +23,28 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @desc    Login user
 // @route   POST /api/v1/auth/login
 // @access  Public
-exports.login = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
+app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
 
-  // Validate email and password
-  if (!email || !password) {
-    return next(new ErrorResponse('Please provide an email and password', 400));
-  }
+    // 1. Query the database
+    const user = await User.findUserByEmail(email);
 
-  // Check for user
-  const user = await User.findOne({ email }).select('+password');
+    // 2. Checks if the database returned nothing
+    if (!user) {
+        // Stop here! Send an error status and a message back to the frontend
+        return res.status(400).json({ 
+            success: false, 
+            message: "User not logged in, try signing up." 
+        });
+    }
 
-  if (!user) {
-    return next(new ErrorResponse('Invalid credentials', 401));
-  }
+    // 3. Verifies password 
+    const isMatch = await passwordCheck(password, user.password);
+    if (!isMatch) {
+        return res.status(401).json({ success: false, message: "Invalid credentials." });
+    }
 
-  // Check if password matches
-  const isMatch = await user.matchPassword(password);
-
-  if (!isMatch) {
-    return next(new ErrorResponse('Invalid credentials', 401));
-  }
-
-  sendTokenResponse(user, 200, res);
+    return res.status(200).json({ success: true, message: "Welcome back!" });
 });
 
 // @desc    Log user out / clear cookie
