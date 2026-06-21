@@ -12,7 +12,7 @@ const logger = createLogger({
     logFormat
   ),
   transports: [
-    new transports.Console()
+    new transports.Console(),
   ],
 });
 
