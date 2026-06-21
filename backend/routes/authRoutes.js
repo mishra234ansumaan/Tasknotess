@@ -1,4 +1,10 @@
 // routes/authRoutes.js
+const authController =
+require('../controllers/authController');
+
+console.log(authController);
+
+const { register, login, logout, getMe } = authController;
 const express = require('express');
 const { register, login, logout, getMe } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
