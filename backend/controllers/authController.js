@@ -1,4 +1,3 @@
-// controllers/authController.js
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
@@ -15,6 +14,33 @@ exports.register = asyncHandler(async (req, res, next) => {
     email,
     password,
   });
+
+  sendTokenResponse(user, 200, res);
+});
+
+// @desc    Login user
+// @route   POST /api/v1/auth/login
+// @access  Public
+exports.login = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Check for user
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user) {
+    return next(
+      new ErrorResponse('Invalid credentials', 401)
+    );
+  }
+
+  // Check password
+  const isMatch = await user.matchPassword(password);
+
+  if (!isMatch) {
+    return next(
+      new ErrorResponse('Invalid credentials', 401)
+    );
+  }
 
   sendTokenResponse(user, 200, res);
 });
@@ -51,7 +77,11 @@ const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
   const maxAge = process.env.JWT_COOKIE_EXPIRE
-    ? parseInt(process.env.JWT_COOKIE_EXPIRE, 10) * 24 * 60 * 60 * 1000
+    ? parseInt(process.env.JWT_COOKIE_EXPIRE, 10) *
+      24 *
+      60 *
+      60 *
+      1000
     : 7 * 24 * 60 * 60 * 1000;
 
   const options = {
