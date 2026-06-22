@@ -398,54 +398,74 @@ async function signupUser() {
 
   }
 }
-function loginUser(){
-
-  let name = document.getElementById("signup-name").value;
+async function loginUser() {
 
   let email = document.getElementById("signup-email").value;
-
   let password = document.getElementById("signup-password").value;
 
-  if(name === "" || email === "" || password === ""){
-
-    showToast("⚠️ Enter all login details");
-
-    return;
-
-  }
-  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if(!emailRegex.test(email)){
-    showToast("⚠️ Please enter a valid email address");
+  if(email === "" || password === "") {
+    showToast("⚠️ Enter email and password");
     return;
   }
 
+  try {
 
-  document.getElementById("profile-name").innerText = name;
+    const response = await fetch(
+      "https://tasknotess-backend.onrender.com/api/v1/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          password
+        })
+      }
+    );
 
-  document.getElementById("profile-email").innerText = email;
+    const data = await response.json();
 
-  let today = new Date();
+    if(data.success) {
 
-  let memberSince = today.toLocaleString("en-US", {
-  month: "long",
-  year: "numeric"
-  });
+      document.getElementById("profile-name").innerText =
+        data.data.username;
 
-document.getElementById("member-since").innerText = memberSince;
+      document.getElementById("profile-email").innerText =
+        data.data.email;
 
-  loggedIn = true;
+      let today = new Date();
 
-  showToast(" Welcome back " + name);
+      let memberSince = today.toLocaleString("en-US", {
+        month: "long",
+        year: "numeric"
+      });
 
-  document.getElementById("signup-name").value = "";
+      document.getElementById("member-since").innerText =
+        memberSince;
 
-  document.getElementById("signup-email").value = "";
+      loggedIn = true;
 
-  document.getElementById("signup-password").value = "";
+      showToast("🎉 Welcome Back " + data.data.username);
+
+      document.getElementById("signup-email").value = "";
+      document.getElementById("signup-password").value = "";
+
+    } else {
+
+      showToast("❌ Login failed");
+
+    }
+
+  } catch(error) {
+
+    console.error(error);
+    showToast("❌ Login failed");
+
+  }
 
 }
-
 
 
 function logoutUser(){
