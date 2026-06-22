@@ -287,27 +287,48 @@ async function fetchNotes() {
 function renderNotes(notes) {
   const container = document.getElementById("main-notes-container");
 
-  if (!container) {
-    console.error("main-notes-container not found");
-    return;
-  }
-
   container.innerHTML = "";
 
   notes.forEach(note => {
+
     const card = document.createElement("div");
     card.className = "note-card";
 
+    // apply color styling like your UI theme
+    card.style.borderLeft = `6px solid ${
+      note.color === "Yellow" ? "#FF8811" :
+      note.color === "Blue" ? "#3B82F6" :
+      note.color === "Green" ? "#22C55E" :
+      note.color === "Pink" ? "#EC4899" :
+      "#3B82F6"
+    }`;
+
     card.innerHTML = `
       <h3>${note.title}</h3>
-      <p>${note.text || ""}</p>
-      <span class="note-tag">${note.tag || ""}</span>
+
+      <p>${note.content || ""}</p>
+
+      <small class="note-tag">
+        ${getTagIcon(note.tag)}
+        ${note.tag || ""}
+      </small>
+
+      <div class="actions">
+
+        <button class="edit-btn" onclick="editNote(this)">Edit</button>
+
+        <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
+
+        <button class="archive-btn" onclick="archiveNote(this)">Archive</button>
+
+        <button class="complete-btn" onclick="completeTask(this)">Complete</button>
+
+      </div>
     `;
 
     container.appendChild(card);
   });
 }
-
 function toggleDarkMode(){
 
   document.body.classList.toggle("dark-theme");
@@ -390,6 +411,29 @@ function setReminder(){
 
   }, delay);
 
+}
+function getTagIcon(tag) {
+
+  switch(tag) {
+
+    case "Priority Task":
+      return `📌`;
+
+    case "Favorite Project":
+      return `⭐`;
+
+    case "Reminder Enabled":
+      return `⏰`;
+
+    case "Upcoming Event":
+      return `🚀`;
+
+    case "Creative Idea":
+      return `💡`;
+
+    default:
+      return `📝`;
+  }
 }
 
 async function signupUser() {
