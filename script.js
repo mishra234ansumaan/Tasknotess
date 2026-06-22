@@ -297,36 +297,46 @@ async function fetchNotes() {
   }
 }
 function renderNotes(notes) {
-
-  const loader = document.getElementById("notes-loading");
   const container = document.getElementById("main-notes-container");
+  const loader = document.getElementById("notes-loading");
 
   container.innerHTML = "";
 
   notes.forEach(note => {
     const card = document.createElement("div");
     card.className = "note-card";
+     card.style.background = getColor(note.color);
+
+    // 🎨 apply color
+    if (note.color) {
+      card.style.background = note.color.toLowerCase();
+    }
 
     card.innerHTML = `
       <h3>${note.title}</h3>
-      <p>${note.content || ""}</p>
-      <span class="note-tag">${note.tag || ""}</span>
 
-     <div class="actions">
-  <button class="edit-btn" onclick="editNote(this)">Edit</button>
+      <p>${note.text || note.description || ""}</p>
 
-  <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
+      <small class="note-tag">
+        ${getTagIcon(note.tag)} ${note.tag || ""}
+      </small>
 
-  <button class="archive-btn" onclick="archiveNote(this)">Archive</button>
+      <div class="category">
+        📁 ${note.category || "General"}
+      </div>
 
-  <button class="complete-btn" onclick="completeTask(this)">Complete</button>
-</div>;
+      <div class="actions">
+        <button class="edit-btn" onclick="editNote(this)">Edit</button>
+        <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
+        <button class="archive-btn" onclick="archiveNote(this)">Archive</button>
+        <button class="complete-btn" onclick="completeTask(this)">Complete</button>
+      </div>
+    `;
 
     container.appendChild(card);
   });
 
-  // SAFETY: ensure loader is hidden immediately after render
-  loader.style.display = "none";
+  if (loader) loader.style.display = "none";
 }
 function toggleDarkMode(){
 
