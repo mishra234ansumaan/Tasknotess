@@ -520,14 +520,22 @@ async function getCurrentUser() {
 
     if(data.success) {
 
-      document.getElementById("profile-name").innerText =
-        data.data.username;
+  document.getElementById("profile-name").innerText = data.data.username;
 
-      document.getElementById("profile-email").innerText =
-        data.data.email;
+  document.getElementById("profile-email").innerText = data.data.email;
 
-      loggedIn = true;
-    }
+  let memberSince = new Date(
+    data.data.createdAt
+  ).toLocaleString("en-US", {
+    month: "long",
+    year: "numeric"
+  });
+
+  document.getElementById("member-since").innerText =
+    memberSince;
+
+  loggedIn = true;
+}
 
   } catch(error) {
 
