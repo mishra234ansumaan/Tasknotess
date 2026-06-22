@@ -265,6 +265,52 @@ function unarchiveNote(button){
   showToast( " Note returned from space archive!!");
 
 }
+async function fetchNotes() {
+  try {
+    const response = await fetch(`${API_BASE}/notes`, {
+      method: "GET",
+      credentials: "include"
+    });
+
+    const data = await response.json();
+
+    console.log("FETCH NOTES RESPONSE:", data);
+
+    if (!response.ok) {
+      showToast("Failed to load notes");
+      return;
+    }
+
+    if (data.success) {
+      renderNotes(data.data);
+    }
+
+  } catch (err) {
+    console.log(err);
+    showToast("Server error while fetching notes");
+  }
+}
+
+function renderNotes(notes) {
+  const container = document.getElementById("main-notes-container");
+
+  container.innerHTML = "";
+
+  notes.forEach(note => {
+    const noteCard = document.createElement("div");
+    noteCard.className = "note-card";
+
+    noteCard.innerHTML = `
+      <h3>${note.title}</h3>
+      <p>${note.text || ""}</p>
+      <span class="note-tag">${note.tag || ""}</span>
+
+      <button onclick="deleteNoteUI('${note._id}', this)">Delete</button>
+    `;
+
+    container.appendChild(noteCard);
+  });
+}
 
 function toggleDarkMode(){
 
@@ -458,6 +504,7 @@ async function loginUser() {
 
       document.getElementById("signup-email").value = "";
       document.getElementById("signup-password").value = "";
+      fetchNotes();
 
     } else {
 
@@ -540,3 +587,9 @@ async function getCurrentUser() {
   }
 }
 getCurrentUser();
+
+window.addEventListener("load", () => {
+  getCurrentUser().then(() => {
+    fetchNotes();
+  });
+});
