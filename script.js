@@ -274,12 +274,7 @@ async function fetchNotes() {
 
     const data = await response.json();
 
-    console.log("FETCH NOTES RESPONSE:", data);
-
-    if (!response.ok) {
-      showToast("Failed to load notes");
-      return;
-    }
+    console.log("FETCH NOTES:", data);
 
     if (data.success) {
       renderNotes(data.data);
@@ -287,28 +282,29 @@ async function fetchNotes() {
 
   } catch (err) {
     console.log(err);
-    showToast("Server error while fetching notes");
   }
 }
-
 function renderNotes(notes) {
   const container = document.getElementById("main-notes-container");
+
+  if (!container) {
+    console.error("main-notes-container not found");
+    return;
+  }
 
   container.innerHTML = "";
 
   notes.forEach(note => {
-    const noteCard = document.createElement("div");
-    noteCard.className = "note-card";
+    const card = document.createElement("div");
+    card.className = "note-card";
 
-    noteCard.innerHTML = `
+    card.innerHTML = `
       <h3>${note.title}</h3>
       <p>${note.text || ""}</p>
       <span class="note-tag">${note.tag || ""}</span>
-
-      <button onclick="deleteNoteUI('${note._id}', this)">Delete</button>
     `;
 
-    container.appendChild(noteCard);
+    container.appendChild(card);
   });
 }
 
@@ -479,40 +475,37 @@ async function loginUser() {
     );
 
     const data = await response.json();
+  if (data.success) {
 
-    if(data.success) {
+  document.getElementById("profile-name").innerText =
+    data.data.username;
 
-      document.getElementById("profile-name").innerText =
-        data.data.username;
+  document.getElementById("profile-email").innerText =
+    data.data.email;
 
-      document.getElementById("profile-email").innerText =
-        data.data.email;
+  let memberSince = new Date(data.data.createdAt).toLocaleString(
+    "en-US",
+    { month: "long", year: "numeric" }
+  );
 
-      let today = new Date();
+  document.getElementById("member-since").innerText =
+    memberSince;
 
-      let memberSince = today.toLocaleString("en-US", {
-        month: "long",
-        year: "numeric"
-      });
+  loggedIn = true;
 
-      document.getElementById("member-since").innerText =
-        memberSince;
+  showToast("🎉 Welcome Back " + data.data.username);
 
-      loggedIn = true;
+  document.getElementById("signup-email").value = "";
+  document.getElementById("signup-password").value = "";
 
-      showToast("🎉 Welcome Back " + data.data.username);
+  // IMPORTANT: delay fetch to ensure session is set
+  setTimeout(() => {
+    fetchNotes();
+  }, 300);
 
-      document.getElementById("signup-email").value = "";
-      document.getElementById("signup-password").value = "";
-      fetchNotes();
-
-    } else {
-
-      showToast("❌ Login failed");
-
-    }
-
-  } catch(error) {
+}
+    
+  catch(error) {
 
     console.error(error);
     showToast("❌ Login failed");
