@@ -535,3 +535,4 @@ async function getCurrentUser() {
 
   }
 }
+getCurrentUser();
