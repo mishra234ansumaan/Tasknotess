@@ -308,7 +308,6 @@ function renderNotes(notes) {
   notes.forEach(note => {
     const card = document.createElement("div");
     card.className = "note-card";
-     card.style.background = getColor(note.color);
 
     // 🎨 apply color
     if (note.color) {
