@@ -85,11 +85,11 @@ const sendTokenResponse = (user, statusCode, res) => {
     : 7 * 24 * 60 * 60 * 1000;
 
   const options = {
-    maxAge,
-    httpOnly: true,
-    sameSite: 'lax',
-  };
-
+  maxAge,
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+};
   if (process.env.NODE_ENV === 'production') {
     options.secure = true;
   }
