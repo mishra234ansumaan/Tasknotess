@@ -343,47 +343,61 @@ function setReminder(){
 
 }
 
-function signupUser(){
+async function signupUser() {
 
-  let name = document.getElementById("signup-name").value;
-
+  let username = document.getElementById("signup-name").value;
   let email = document.getElementById("signup-email").value;
-
   let password = document.getElementById("signup-password").value;
 
-  if(name === "" || email === "" || password === ""){
+  if(username === "" || email === "" || password === ""){
     showToast("⚠️ Fill all signup fields");
     return;
   }
 
-  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  try {
 
-  if(!emailRegex.test(email)){
-    showToast("⚠️ Please enter a valid email address");
-    return;
+    const response = await fetch(
+      "https://tasknotess-backend.onrender.com/api/v1/auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if(data.success){
+
+      document.getElementById("profile-name").innerText =
+        data.data.username;
+
+      document.getElementById("profile-email").innerText =
+        data.data.email;
+
+      loggedIn = true;
+
+      showToast("🎉 Welcome to NoteNest " + data.data.username);
+
+    } else {
+
+      showToast("Signup failed");
+
+    }
+
+  } catch(error) {
+
+    console.error(error);
+    showToast("Server error");
+
   }
-
-  document.getElementById("profile-name").innerText = name;
-  document.getElementById("profile-email").innerText = email;
-
-  let today = new Date();
-
-  let memberSince = today.toLocaleString("en-US", {
-    month: "long",
-    year: "numeric"
-  });
-
-  document.getElementById("member-since").innerText = memberSince;
-
-  loggedIn = true;
-
-  showToast("🎉 Welcome to NoteNest " + name);
-
-  document.getElementById("signup-name").value = "";
-  document.getElementById("signup-email").value = "";
-  document.getElementById("signup-password").value = "";
 }
-
 function loginUser(){
 
   let name = document.getElementById("signup-name").value;
