@@ -266,6 +266,7 @@ function unarchiveNote(button){
 
 }
 async function fetchNotes() {
+  document.getElementById("notes-loading").style.display = "block";
   try {
     const response = await fetch(`${API_BASE}/notes`, {
       method: "GET",
