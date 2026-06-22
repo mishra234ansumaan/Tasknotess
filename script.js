@@ -1,3 +1,4 @@
+const API_BASE = "https://tasknotess-backend.onrender.com/api/v1";
 function showSection(sectionId, button){
 
   document.getElementById("dashboard-section").style.display = "none";
@@ -24,50 +25,51 @@ function showSection(sectionId, button){
 }
 let loggedIn = false;
 
-function addNote(){
+async function addNote(){
 
-  let title =document.getElementById("note-title").value;
-
+  let title = document.getElementById("note-title").value;
   let text = document.getElementById("note-text").value;
-  
   let tag = document.getElementById("note-tag").value;
-
   let noteColor = document.getElementById("note-color").value;
 
-  if(title === "" || text === ""){ alert("Please fill all fields");
+  if(title === "" || text === ""){
+    alert("Please fill all fields");
     return;
   }
 
+  try {
 
-  let newNote = document.createElement("div");
-  newNote.classList.add( "note-card", noteColor);
-  newNote.innerHTML = `
+    const response = await fetch(`${API_BASE}/notes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        title,
+        text,
+        tag,
+        color: noteColor
+      })
+    });
 
-    <h3>${title}</h3>
+    const data = await response.json();
 
-    <p>${text}</p>
+    if(data.success){
+      showToast("🔥 Boom! Your note just entered the NoteNest universe , Note captured before your brain forgot it 😄");
 
-    <small class="note-tag">${tag}</small>
-    <div class="actions">
+      document.getElementById("note-title").value = "";
+      document.getElementById("note-text").value = "";
 
-      <button class="edit-btn" onclick="editNote(this)">Edit</button>
+      fetchNotes(); // refresh UI
+    } else {
+      showToast("❌ Failed to create note");
+    }
 
-      <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
-
-      <button class="archive-btn">Archive</button>
-
-      <button class="complete-btn"onclick="completeTask(this)">Complete</button>
-
-    </div>
-
-  `;
-showToast("🔥 Boom! Your note just entered the NoteNest universe , Note captured before your brain forgot it 😄");
- document.getElementById( "main-notes-container").appendChild(newNote);
-
-  document.getElementById("note-title").value = "";
-
-  document.getElementById("note-text").value = "";
-
+  } catch(err){
+    console.log(err);
+    showToast("Server error");
+  }
 }
 
 function showToast(message){
