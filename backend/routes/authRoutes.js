@@ -10,4 +10,5 @@ router.get('/logout', logout);
 router.get('/me', protect, getMe);
 
 module.exports = router;
+console.log("AUTHROUTES VERSION 999");
 
