@@ -18,7 +18,7 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: "https://notenest-lilac-alpha.vercel.app",credentials: true}));
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp());
