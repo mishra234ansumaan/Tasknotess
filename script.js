@@ -25,9 +25,6 @@ function showSection(sectionId, button){
 }
 let loggedIn = false;
 
-
-}
-
 async function addNote() {
   let title = document.getElementById("note-title").value;
   let text = document.getElementById("note-text").value;
@@ -299,6 +296,14 @@ async function fetchNotes() {
     }, 150);
   }
 }
+
+const colorMap = {
+  Yellow: "rgba(255, 235, 59, 0.25)",
+  Blue: "rgba(59, 130, 246, 0.20)",
+  Green: "rgba(34, 197, 94, 0.20)",
+  Pink: "rgba(236, 72, 153, 0.20)"
+};
+
 function renderNotes(notes) {
   const container = document.getElementById("main-notes-container");
   const loader = document.getElementById("notes-loading");
@@ -308,18 +313,22 @@ function renderNotes(notes) {
   notes.forEach(note => {
     const card = document.createElement("div");
     card.className = "note-card";
+
+    const colorMap = {
+      Yellow: "#FFEB3B",
+      Blue: "#3B82F6",
+      Green: "#22C55E",
+      Pink: "#EC4899"
+    };
+
+    card.style.background = colorMap[note.color] || "rgba(255,255,255,0.6)";
     card.innerHTML = `
       <h3>${note.title}</h3>
-
       <p>${note.text || note.description || ""}</p>
 
       <small class="note-tag">
         ${getTagIcon(note.tag)} ${note.tag || ""}
       </small>
-
-      <div class="category">
-        📁 ${note.category || "General"}
-      </div>
 
       <div class="actions">
         <button class="edit-btn" onclick="editNote(this)">Edit</button>
