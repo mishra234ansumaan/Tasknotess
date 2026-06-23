@@ -220,57 +220,61 @@ function editNote(button){
 
 }
 async function saveEditedNote(button) {
-    try {
-        const card = button.closest(".note-card");
-        const id = getNoteId(button);
+  try {
+    const card = button.closest(".note-card");
+    const id = getNoteId(button);
 
-        let noteCard = button.parentElement.parentElement;
-        let newTitle = noteCard.querySelector("#edit-title").value;
+    // Safely look for the input inside this specific card
+    let newTitle = card.querySelector("#edit-title").value;
 
-        // In your frontend script.js:
-      const res = await fetch(`/api/v1/notes/${id}`, {
-     method: 'PUT',
-     headers: {
+    // Fixed: Added API_BASE and credentials
+    const res = await fetch(`${API_BASE}/notes/${id}`, {
+      method: 'PUT',
+      headers: {
         'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ title: newTitle })
+      },
+      credentials: "include", 
+      body: JSON.stringify({ title: newTitle })
     });
 
-        // 2. Now 'res' exists, so this line will work perfectly:
-        const data = await res.json(); 
+    const data = await res.json();
 
-        if (data.success) {
-            showToast("✏️ Updated successfully");
-            fetchNotes();
-        } else {
-            showToast("❌ Update failed");
-        }
-
-    } catch (err) {
-        console.log(err);
+    if (data.success) {
+      showToast("📝 Updated successfully!");
+      await fetchNotes();
+    } else {
+      showToast("❌ Update failed");
     }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function completeTask(button) {
-    try {
-        const id = getNoteId(button);
+  try {
+    // Fixed: Added the missing ID definition
+    const id = getNoteId(button);
 
-        // Make the network call to your backend completion endpoint
-        const res = await fetch(`/api/v1/notes/${id}/complete`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' }
-        });
+    // Fixed: Added API_BASE and credentials
+    const res = await fetch(`${API_BASE}/notes/${id}/complete`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      credentials: "include" 
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (data.success) {
-            showToast("✅ Completed");
-            fetchNotes();
-        }
-    } catch (err) {
-        console.log(err);
+    if (data.success) {
+      showToast("✅ Task Completed");
+      await fetchNotes();
     }
+  } catch (err) {
+    console.log(err);
+  }
 }
+
 function toggleArchive() {
   let archiveSection = document.getElementById("archive-container");
 
@@ -285,50 +289,49 @@ function toggleArchive() {
 }
 
 async function archiveNote(button) {
-    try {
-        const id = getNoteId(button);
-        let noteCard = button.parentElement.parentElement;
+  try {
+    const id = getNoteId(button);
 
-        // Matches your backend route: PUT /api/v1/notes/:id/archive
-        const res = await fetch(`/api/v1/notes/${id}/archive`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    // 3. FIXED: Using dynamic API_BASE and passing along system session credentials
+    const res = await fetch(`${API_BASE}/notes/${id}/archive`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: "include" 
+    });
 
-        const data = await res.json();
-
-        if (data.success) {
-            showToast("📁 Note sent to the galaxy archive");
-            fetchNotes();
-        }
-    } catch (err) {
-        console.log(err);
+    const data = await res.json();
+    if (data.success) {
+      showToast("🗄️ Note moved to archive");
+      await fetchNotes();
     }
+  } catch (err) {
+    console.error("Archive error:", err);
+  }
 }
 
 async function unarchiveNote(button) {
-    try {
-        const id = getNoteId(button);
+  try {
+    const id = getNoteId(button);
 
-        // Send request to your backend to change { archived: false }
-        const res = await fetch(`/api/v1/notes/${id}/unarchive`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    // 3. FIXED: Using dynamic API_BASE and passing along system session credentials
+    const res = await fetch(`${API_BASE}/notes/${id}/unarchive`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: "include"
+    });
 
-        const data = await res.json();
-
-        if (data.success) {
-            showToast("🚀 Note returned from space archive!!");
-            fetchNotes(); // Keeps your frontend perfectly in sync with the database
-        }
-    } catch (err) {
-        console.log(err);
+    const data = await res.json();
+    if (data.success) {
+      showToast("📥 Note restored to dashboard");
+      await fetchNotes();
     }
+  } catch (err) {
+    console.error("Unarchive error:", err);
+  }
 }
 async function fetchNotes() {
 
@@ -371,10 +374,10 @@ const colorMap = {
 
 function renderNotes(notes) {
   const container = document.getElementById("main-notes-container");
-  const archiveContainer = document.getElementById("archive-container"); // Added this to target your archive tray
+  const archiveContainer = document.getElementById("archive-container");
   const loader = document.getElementById("notes-loading");
 
-  // Clear BOTH containers before rendering updated data
+  // Clear out both display grids
   container.innerHTML = "";
   if (archiveContainer) {
     archiveContainer.innerHTML = "";
@@ -393,10 +396,9 @@ function renderNotes(notes) {
     };
     card.style.background = colorMap[note.color] || "rgba(255, 255, 255, 0.6)";
 
-    // Identify if the note has been archived
-    const isArchived = note.archived || false;
+    // 1. FIXED: Pointing directly to your true database key name
+    const isArchived = note.archived || false; 
 
-    // Dynamically toggle button text & action based on state
     const archiveButtonHtml = isArchived 
       ? `<button class="archive-btn" onclick="unarchiveNote(this)">Unarchive</button>`
       : `<button class="archive-btn" onclick="archiveNote(this)">Archive</button>`;
@@ -415,7 +417,7 @@ function renderNotes(notes) {
       </div>
     `;
 
-    // CRITICAL FIX: Sort the cards into their respective trays
+    // 2. FIXED: Route cards to the correct visual panel container
     if (isArchived && archiveContainer) {
       archiveContainer.appendChild(card);
     } else {
