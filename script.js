@@ -271,10 +271,17 @@ async function completeTask(button) {
         console.log(err);
     }
 }
-
 function toggleArchive() {
   let archiveSection = document.getElementById("archive-container");
-  archiveSection.classList.toggle("hidden");
+
+  if (archiveSection.style.display === "none" || archiveSection.style.display === "") {
+    archiveSection.style.display = "block";
+    
+    // Un-comment this line ONLY if your backend separates active and archived notes queries:
+    // fetchArchivedNotes(); 
+  } else {
+    archiveSection.style.display = "none";
+  }
 }
 
 async function archiveNote(button) {
