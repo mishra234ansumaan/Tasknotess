@@ -220,59 +220,56 @@ function editNote(button){
 
 }
 async function saveEditedNote(button) {
-  const card = button.closest(".note-card");
-  const id = card.getAttribute("data-id");
+    try {
+        const card = button.closest(".note-card");
+        const id = getNoteId(button);
 
-  const newTitle = card.querySelector("#edit-title").value;
-  const newText = card.querySelector("#edit-text").value;
-  const newTag = card.querySelector(".edit-tag").value;
+        let noteCard = button.parentElement.parentElement;
+        let newTitle = noteCard.querySelector("#edit-title").value;
 
-  try {
-    const res = await fetch(`${API_BASE}/notes/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        title: newTitle,
-        text: newText,
-        tag: newTag
-      })
+        // In your frontend script.js:
+const res = await fetch(`/api/v1/notes/${id}`, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ title: newTitle })
     });
 
-    await handleResponse(res);
+        // 2. Now 'res' exists, so this line will work perfectly:
+        const data = await res.json(); 
 
-    showToast("✏️ Note updated successfully");
+        if (data.success) {
+            showToast("✏️ Updated successfully");
+            fetchNotes();
+        } else {
+            showToast("❌ Update failed");
+        }
 
-    // VERY IMPORTANT
-    fetchNotes(); // reload UI from backend
-
-  } catch (err) {
-    console.log(err);
-    showToast("❌ Update failed");
-  }
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function completeTask(button) {
-  const id = button.closest(".note-card").getAttribute("data-id");
+    try {
+        const id = getNoteId(button);
 
-  try {
-    const res = await fetch(`${API_BASE}/notes/${id}/complete`, {
-      method: "PUT",
-      credentials: "include"
-    });
+        // Make the network call to your backend completion endpoint
+        const res = await fetch(`/api/v1/notes/${id}/complete`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        });
 
-    await handleResponse(res);
+        const data = await res.json();
 
-    showToast("✅ Mission completed! Productivity level increased");
-
-    fetchNotes();
-
-  } catch (err) {
-    console.log(err);
-    showToast("❌ Complete failed");
-  }
+        if (data.success) {
+            showToast("✅ Completed");
+            fetchNotes();
+        }
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 function toggleArchive(){
@@ -288,44 +285,50 @@ function toggleArchive(){
 
 }
 async function archiveNote(button) {
-  const id = button.closest(".note-card").getAttribute("data-id");
+    try {
+        const id = getNoteId(button);
+        let noteCard = button.parentElement.parentElement;
 
-  try {
-    const res = await fetch(`${API_BASE}/notes/${id}/archive`, {
-      method: "PUT",
-      credentials: "include"
-    });
+        // Matches your backend route: PUT /api/v1/notes/:id/archive
+        const res = await fetch(`/api/v1/notes/${id}/archive`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-    await handleResponse(res);
+        const data = await res.json();
 
-    showToast("📂 Note sent to the galaxy archive");
-
-    fetchNotes(); // IMPORTANT
-
-  } catch (err) {
-    console.log(err);
-    showToast("❌ Archive failed");
-  }
-}
-async function unarchiveNote(button) {
-  const id = getNoteId(button);
-
-  try {
-    const res = await fetch(`${API_BASE}/notes/${id}/unarchive`, {
-      method: "PUT",
-      credentials: "include"
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      showToast(" Note returned from space archive!!");
-      fetchNotes();
+        if (data.success) {
+            showToast("📁 Note sent to the galaxy archive");
+            fetchNotes();
+        }
+    } catch (err) {
+        console.log(err);
     }
+}
 
-  } catch (err) {
-    console.log(err);
-  }
+async function unarchiveNote(button) {
+    try {
+        const id = getNoteId(button);
+
+        // Send request to your backend to change { archived: false }
+        const res = await fetch(`/api/v1/notes/${id}/unarchive`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            showToast("🚀 Note returned from space archive!!");
+            fetchNotes(); // Keeps your frontend perfectly in sync with the database
+        }
+    } catch (err) {
+        console.log(err);
+    }
 }
 async function fetchNotes() {
 
