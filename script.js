@@ -404,18 +404,17 @@ function renderNotes(notes) {
       : `<button class="archive-btn" onclick="archiveNote(this)">Archive</button>`;
 
     card.innerHTML = `
-      <h3>${note.title}</h3>
-      <p>${note.text || ""}</p>
-      <small class="note-tag">
-        ${getTagIcon(note.tag)} ${note.tag || ""}
-      </small>
-      <div class="actions">
-        <button class="edit-btn" onclick="editNote(this)">Edit</button>
-        <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
-        ${archiveButtonHtml}
-        <button class="complete-btn" onclick="completeTask(this)">Complete</button>
-      </div>
-    `;
+  <h3>${note.title}</h3>
+  <p>${note.description || ""}</p>  <small class="note-tag">
+    ${getTagIcon(note.tag)} ${note.tag || ""}
+  </small>
+  <div class="actions">
+    <button class="edit-btn" onclick="editNote(this)">Edit</button>
+    <button class="delete-btn" onclick="deleteNote(this)">Delete</button>
+    ${archiveButtonHtml}
+    <button class="complete-btn" onclick="completeTask(this)">Complete</button>
+  </div>
+`;
 
     // 2. FIXED: Route cards to the correct visual panel container
     if (isArchived && archiveContainer) {
