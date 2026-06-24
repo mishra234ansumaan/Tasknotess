@@ -380,7 +380,7 @@ async function fetchNotes() {
 
     setTimeout(() => {
       loader.style.display = "none";
-    }, 100);
+    }, 50);
   }
 }
 
