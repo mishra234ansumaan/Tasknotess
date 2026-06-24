@@ -52,12 +52,12 @@ async function addNote() {
         "Content-Type": "application/json"
       },
       credentials: "include",
-      body: JSON.stringify({
-        title,
-        text,
-        tag,
-        color: noteColor
-      })
+     body: JSON.stringify({
+    title,
+    content: text,
+    tag,
+    color: noteColor
+  })
     });
 
     console.log("Status:", response.status);
@@ -76,7 +76,7 @@ async function addNote() {
       document.getElementById("note-title").value = "";
       document.getElementById("note-text").value = "";
 
-      // IMPORTANT: only if fetchNotes exists
+      
       if (typeof fetchNotes === "function") {
         fetchNotes();
       }
@@ -220,42 +220,66 @@ function editNote(button){
 
 }
 async function saveEditedNote(button) {
+
   try {
+
     const card = button.closest(".note-card");
+
     const id = getNoteId(button);
 
-    // Safely look for the input inside this specific card
     let newTitle = card.querySelector("#edit-title").value;
 
-    // Fixed: Added API_BASE and credentials
+    let newText = card.querySelector("#edit-text").value;
+
+    let newTag = card.querySelector(".edit-tag").value;
+
     const res = await fetch(`${API_BASE}/notes/${id}`, {
-      method: 'PUT',
+
+      method: "PUT",
+
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
-      credentials: "include", 
-      body: JSON.stringify({ title: newTitle })
+
+      credentials: "include",
+
+      body: JSON.stringify({
+        title: newTitle,
+        content: newText,
+        tag: newTag
+      })
+
     });
 
     const data = await res.json();
 
-    if (data.success) {
-      showToast("📝 Updated successfully!");
-      await fetchNotes();
+    if(data.success){
+
+      showToast("Note updated successfully inside NoteNest!!");
+
+      fetchNotes();
+
     } else {
+
       showToast("❌ Update failed");
+
     }
-  } catch (err) {
+
+  } catch(err){
+
     console.log(err);
+
+    showToast("❌ Server error");
+
   }
+
 }
 
 async function completeTask(button) {
   try {
-    // Fixed: Added the missing ID definition
+    
     const id = getNoteId(button);
 
-    // Fixed: Added API_BASE and credentials
     const res = await fetch(`${API_BASE}/notes/${id}/complete`, {
       method: 'PUT',
       headers: { 
@@ -267,7 +291,7 @@ async function completeTask(button) {
     const data = await res.json();
 
     if (data.success) {
-      showToast("✅ Task Completed");
+      showToast("✅ Mission completed! Productivity level increased");
       await fetchNotes();
     }
   } catch (err) {
@@ -281,7 +305,6 @@ function toggleArchive() {
   if (archiveSection.style.display === "none" || archiveSection.style.display === "") {
     archiveSection.style.display = "block";
     
-    // Un-comment this line ONLY if your backend separates active and archived notes queries:
     fetchArchivedNotes(); 
   } else {
     archiveSection.style.display = "none";
@@ -292,7 +315,6 @@ async function archiveNote(button) {
   try {
     const id = getNoteId(button);
 
-    // 3. FIXED: Using dynamic API_BASE and passing along system session credentials
     const res = await fetch(`${API_BASE}/notes/${id}/archive`, {
       method: 'PUT',
       headers: {
@@ -303,7 +325,7 @@ async function archiveNote(button) {
 
     const data = await res.json();
     if (data.success) {
-      showToast("🗄️ Note moved to archive");
+      showToast("📂 Note sent to the galaxy archive");
       await fetchNotes();
     }
   } catch (err) {
@@ -315,7 +337,6 @@ async function unarchiveNote(button) {
   try {
     const id = getNoteId(button);
 
-    // 3. FIXED: Using dynamic API_BASE and passing along system session credentials
     const res = await fetch(`${API_BASE}/notes/${id}/unarchive`, {
       method: 'PUT',
       headers: {
@@ -326,7 +347,7 @@ async function unarchiveNote(button) {
 
     const data = await res.json();
     if (data.success) {
-      showToast("📥 Note restored to dashboard");
+      showToast("Note returned from space archive!!");
       await fetchNotes();
     }
   } catch (err) {
@@ -338,7 +359,6 @@ async function fetchNotes() {
   const loader = document.getElementById("notes-loading");
   const container = document.getElementById("main-notes-container");
 
-  // SHOW LOADER FIRST
   loader.style.display = "block";
 
   try {
@@ -358,10 +378,9 @@ async function fetchNotes() {
 
   } finally {
 
-    // SMALL DELAY TO PREVENT FLASH ISSUE
     setTimeout(() => {
       loader.style.display = "none";
-    }, 150);
+    }, 100);
   }
 }
 
@@ -377,7 +396,6 @@ function renderNotes(notes) {
   const archiveContainer = document.getElementById("archive-container");
   const loader = document.getElementById("notes-loading");
 
-  // Clear out both display grids
   container.innerHTML = "";
   if (archiveContainer) {
     archiveContainer.innerHTML = "";
@@ -385,7 +403,6 @@ function renderNotes(notes) {
 
   notes.forEach(note => {
 
-    // 📝 FIX: Skip completed tasks so they disappear from the dashboard
     if (note.completed) {
      return;
     }
@@ -401,7 +418,6 @@ function renderNotes(notes) {
     };
     card.style.background = colorMap[note.color] || "rgba(255, 255, 255, 0.6)";
 
-    // 1. FIXED: Pointing directly to your true database key name
     const isArchived = note.archived || false; 
 
     const archiveButtonHtml = isArchived 
@@ -410,7 +426,7 @@ function renderNotes(notes) {
 
     card.innerHTML = `
   <h3>${note.title}</h3>
-  <p>${note.description || ""}</p>  <small class="note-tag">
+ <p>${note.content || ""}</p> <small class="note-tag">
     ${getTagIcon(note.tag)} ${note.tag || ""}
   </small>
   <div class="actions">
@@ -421,7 +437,6 @@ function renderNotes(notes) {
   </div>
 `;
 
-    // 2. FIXED: Route cards to the correct visual panel container
     if (isArchived && archiveContainer) {
       archiveContainer.appendChild(card);
     } else {
