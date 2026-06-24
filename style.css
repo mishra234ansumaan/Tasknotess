@@ -600,3 +600,8 @@ footer {
   display:none;
 }
 
+.tag-svg {
+    vertical-align: middle;
+    display: inline-block;
+    margin-right: 6px; /* Spacing between the icon and the tag text */
+}
