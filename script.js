@@ -599,7 +599,7 @@ async function signupUser() {
 
     } else {
 
-      showToast(data.error || "Signup failed");
+      showToast(data.error || "A user is already logged in. Please logout first");
 
     }
 
@@ -695,6 +695,10 @@ async function logoutUser() {
       document.getElementById("profile-email").innerText = "Not Logged In";
 
       document.getElementById("member-since").innerText = "";
+
+      document.getElementById("main-notes-container").innerHTML = "";
+
+      document.getElementById("archive-container").innerHTML = "";
 
       loggedIn = false;
 
