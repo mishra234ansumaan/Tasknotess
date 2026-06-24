@@ -189,26 +189,79 @@ function editNote(button){
   textElement.innerHTML = ` <textarea id="edit-text">${currentText}</textarea>`;
 
   tagElement.innerHTML = `  <select class="edit-tag">
+  import React from 'react';
 
-      <option ${currentTag === "📌 Priority Task" ? "selected" : ""}>
-      📌 Priority Task
-      </option>
+// --- 1. DEFINE YOUR SVG COMPONENTS ---
+const HomeIcon = () => (
+  <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
 
-      <option ${currentTag === "⭐ Favorite Project" ? "selected" : ""}>
-      ⭐ Favorite Project
-      </option>
+const MessagesIcon = () => (
+  <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
 
-      <option ${currentTag === "⏰ Reminder Enabled" ? "selected" : ""}>
-      ⏰ Reminder Enabled
-      </option>
+const NotificationsIcon = () => (
+  <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+  </svg>
+);
 
-      <option ${currentTag === "🚀 Upcoming Event" ? "selected" : ""}>
-      🚀 Upcoming Event
-      </option>
+const ProfileIcon = () => (
+  <svg xmlns="http://w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
 
-      <option ${currentTag === "💡 Creative Idea" ? "selected" : ""}>
-      💡 Creative Idea
-      </option>
+// --- 2. UPDATE YOUR CONFIG ARRAY ---
+// Emojis are replaced by the raw JSX elements defined above
+const sidebarOptions = [
+  { id: 1, title: 'Home', icon: <HomeIcon />, active: true },
+  { id: 2, title: 'Messages', icon: <MessagesIcon />, active: false },
+  { id: 3, title: 'Notifications', icon: <NotificationsIcon />, active: false },
+  { id: 4, title: 'Profile', icon: <ProfileIcon />, active: false }
+];
+
+// --- 3. RENDER THE CONTENT ---
+export default function Sidebar() {
+  return (
+    <div style={{ backgroundColor: '#1a1a1a', color: '#fff', width: '240px', padding: '15px', fontFamily: 'sans-serif' }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '20px', paddingLeft: '10px' }}>Navigation</div>
+      
+      {sidebarOptions.map((item) => (
+        <div 
+          key={item.id} 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '10px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            backgroundColor: item.active ? '#333' : 'transparent',
+            transition: 'background 0.2s'
+          }}
+        >
+          {/* This renders the SVG icon directly instead of an emoji string */}
+          <span style={{ display: 'flex', alignItems: 'center', color: item.active ? '#00bcff' : '#aaa' }}>
+            {item.icon}
+          </span>
+          
+          <span style={{ fontSize: '14px', fontWeight: item.active ? '600' : '400' }}>
+            {item.title}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
     </select>`;
 
