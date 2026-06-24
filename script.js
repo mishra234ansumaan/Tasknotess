@@ -169,6 +169,7 @@ function searchNotes(){
 }
 
 function editNote(button) {
+   // Locate the parent note card element
    const noteCard = button.closest('.note-card');
    
    const titleElement = noteCard.querySelector('h3');
@@ -178,14 +179,14 @@ function editNote(button) {
    let currentTitle = titleElement.innerText;
    let currentText = textElement.innerText;
    
-   // Clean out emojis to get the exact tag name text string
+   // Extract clean text tag name without any old emojis attached to it
    let currentTag = tagElement.innerText.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
 
-   // Swap text elements for editable inputs
+   // Swap text nodes out for interactive input fields
    titleElement.innerHTML = `<input type="text" id="edit-title" value="${currentTitle}">`;
    textElement.innerHTML = `<textarea id="edit-text">${currentText}</textarea>`;
    
-   // Insert your clean, vector-ready select dropdown list
+   // Replace the tag display with the dropdown selector menu
    tagElement.innerHTML = `
       <select class="edit-tag">
          <option value="Priority Task" ${currentTag === "Priority Task" ? "selected" : ""}>Priority Task</option>
@@ -196,7 +197,7 @@ function editNote(button) {
       </select>
    `;
 
-   // Switch your Edit button over to a functional Save button 
+   // Convert the clicked Edit button into a functional Save button
    button.innerText = "Save";
    button.setAttribute("onclick", "saveEditedNote(this)");
    
