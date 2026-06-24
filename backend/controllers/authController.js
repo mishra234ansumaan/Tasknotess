@@ -7,6 +7,14 @@ const logger = require('../utils/logger');
 // @route   POST /api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
+
+  if (req.cookies.token) {
+    return res.status(400).json({
+      success: false,
+      error: "A user is already logged in. Please logout first."
+    });
+  }
+
   const { username, email, password } = req.body;
 
   const user = await User.create({
@@ -17,7 +25,6 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res);
 });
-
 // @desc    Login user
 // @route   POST /api/v1/auth/login
 // @access  Public
